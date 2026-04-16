@@ -1,0 +1,63 @@
+{
+  "examples/demo.py": {
+    "has_leakage": false,
+    "leakage_type": null,
+    "confidence": 0.95,
+    "fix_suggestion": "Pipeline appears clean.",
+    "details": null
+  },
+  "examples/buggy_pipelines/pipeline_5_sequential_split.py": {
+    "has_leakage": true,
+    "leakage_type": "sequential_split",
+    "confidence": 0.95,
+    "fix_suggestion": "Use train_test_split with stratification.",
+    "details": {
+      "severity": "Medium"
+    }
+  },
+  "examples/buggy_pipelines/pipeline_3_target_encoding_leak.py": {
+    "has_leakage": true,
+    "leakage_type": "target_encoding_before_split",
+    "confidence": 0.95,
+    "fix_suggestion": "Perform target encoding inside a cross-validation loop or after splitting.",
+    "details": {
+      "severity": "Critical"
+    }
+  },
+  "examples/buggy_pipelines/pipeline_2_scaling_leak.py": {
+    "has_leakage": true,
+    "leakage_type": "scaling_before_split",
+    "confidence": 0.95,
+    "fix_suggestion": "Fit the scaler ONLY on training data.",
+    "details": {
+      "severity": "Critical"
+    }
+  },
+  "examples/buggy_pipelines/pipeline_1_imputation_leak.py": {
+    "has_leakage": true,
+    "leakage_type": "imputation_before_split",
+    "confidence": 0.95,
+    "fix_suggestion": "Use Pipeline to fit imputer only on training data.",
+    "details": {
+      "severity": "Critical"
+    }
+  },
+  "examples/buggy_pipelines/pipeline_4_feature_leak.py": {
+    "has_leakage": true,
+    "leakage_type": "sequential_split",
+    "confidence": 0.95,
+    "fix_suggestion": "Use train_test_split with stratification.",
+    "details": {
+      "severity": "Medium"
+    }
+  },
+  "examples/buggy_pipelines/pipeline_6_correct.py": {
+    "has_leakage": true,
+    "leakage_type": "imputation_before_split",
+    "confidence": 0.95,
+    "fix_suggestion": "Use Pipeline to fit imputer only on training data.",
+    "details": {
+      "severity": "Critical"
+    }
+  }
+}

@@ -18,6 +18,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
+from sklearn.model_selection import KFold # Added for testing time_series_shuffle
 from sklearn.metrics import accuracy_score, classification_report
 
 def correct_pipeline(df, target_col, feature_cols, test_size=0.2, random_state=42):
@@ -46,6 +47,9 @@ def correct_pipeline(df, target_col, feature_cols, test_size=0.2, random_state=4
         ))
     ])
     
+    # Example of KFold used correctly (no shuffle)
+    cv = KFold(n_splits=5, shuffle=False, random_state=random_state)
+
     # ✅ STEP 3: Train (imputer and scaler fit only on X_train)
     pipeline.fit(X_train, y_train)
     
