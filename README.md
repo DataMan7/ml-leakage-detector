@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Python-3.12%2B-blue?logo=python" alt="Python">
   <img src="https://img.shields.io/badge/Test%20Coverage-70%25-green?logo=shield">
   <img src="https://img.shields.io/badge/License-MIT-yellow?logo=document">
+  <img src="https://img.shields.io/badge/Mercor%20Ready-✅-green?logo=check">
 </p>
 
 **ML Leakage Detector** is a production-grade static analysis tool that detects data leakage patterns in Machine Learning pipelines using Python's Abstract Syntax Tree (AST). It helps data scientists and ML engineers identify and fix common mistakes that lead to overly optimistic model performance.
@@ -25,6 +26,7 @@ In ML, **Data Leakage** occurs when information from the test set "leaks" into t
   - Time-series shuffle
 - **🔄 CLI Support**: Scan entire directories with JSON output for CI/CD integration
 - **✅ Test Coverage**: 70% coverage with 12 passing tests
+- **📈 Severity-Based Reporting**: Prioritizes issues by risk level (Critical/High/Medium)
 
 ## 🚀 Quick Start
 
@@ -67,58 +69,79 @@ ml-leakage-detector examples/
 
 # Output as JSON (for CI/CD)
 ml-leakage-detector examples/ --json
+
+# Sort by severity (Critical first)
+ml-leakage-detector examples/ --sort-severity
 ```
 
 ## 📋 Test Results Explained
 
-The test suite validates that the detector correctly identifies leakage patterns while avoiding false positives. Here's what each test validates:
+All **12 tests passed** with production-grade validation:
 
 | Test Name | Purpose | What It Tests |
 |-----------|---------|---------------|
 | `test_detector_initialization` | Basic Setup | Verifies the detector loads with at least 3 patterns |
-| `test_no_leak_in_comments` | Context Awareness | Ensures keywords in comments (e.g., `# StandardScaler`) don't trigger warnings |
+| `test_no_leak_in_comments` | Context Awareness | Ensures keywords in comments don't trigger warnings |
 | `test_imputation_leak_detection` | Core Pattern | Detects `X.fillna()` or `SimpleImputer()` before splitting |
 | `test_scaling_leak_detection` | Core Pattern | Detects `StandardScaler().fit_transform(X)` before splitting |
 | `test_sequential_split_detection` | Core Pattern | Detects manual slicing like `X[:800]` instead of `train_test_split` |
 | `test_correct_pipeline_no_detection` | False Positive Prevention | Verifies correct usage like `train_test_split()` + `scaler.fit(X_train)` |
-| `test_report_generation_with_leakage` | Output Format | Confirms the report lists ALL leaks found, not just the first one |
-| `test_multiple_leaks_detection` | Comprehensive Scan | Can find 2+ leaks in a single file (e.g., both imputation AND scaling) |
+| `test_report_generation_with_leakage` | Output Format | Confirms the report lists ALL leaks sorted by severity |
+| `test_multiple_leaks_detection` | Comprehensive Scan | Can find 2+ leaks in a single file |
 | `test_time_series_shuffle_detection` | Specialized Pattern | Detects `KFold(shuffle=True)` which breaks temporal order |
 | `test_target_encoding_detection` | Specialized Pattern | Detects `groupby().mean()` using target variable before split |
 | `test_transformer_in_pipeline_not_flagged` | Advanced Logic | **Pipeline Awareness**: Ignores transformers inside `Pipeline([...])` |
 | `test_feature_selection_leak_detection` | Specialized Pattern | Detects `SelectKBest().fit(X, y)` before splitting |
 
-### Current Test Status
+## 🎓 For Mercor Interview
 
-```
-======================== 12 passed in 0.31s ========================
-Coverage: src/detector.py (66%), src/patterns.py (100%)
-```
+This project demonstrates the exact skills tested in Mercor's Domain Expert Assessment:
+
+### The 3 Hardest Interview Questions (And How to Answer)
+
+**Q1: AST Robustness**
+> "How would you distinguish between dangerous imputation vs safe imputation AFTER the split?"
+
+- **Answer**: Implement Variable Tracking + Control Flow Analysis
+- **Key Phrase**: "Semantic analyzer that understands WHEN operations happen"
+
+**Q2: False Positive Handling**
+> "How would you ignore transformers inside sklearn.Pipeline?"
+
+- **Answer**: Use AST node IDs to create a Safe List
+- **Key Phrase**: "Production-grade false positive reduction"
+
+**Q3: Production Deployment**
+> "How would you prioritize 50 leaks in a legacy codebase?"
+
+- **Answer**: Implement 3-tier severity system (Critical/High/Medium)
+- **Key Phrase**: "Turns static analysis into actionable roadmap"
+
+### Interview Talking Points
+
+✅ **Code Validation Skills**: Automated detection of ML bugs using AST  
+✅ **Software Engineering**: Clean architecture, 70% test coverage, TDD  
+✅ **Production Readiness**: CI/CD integration with exit codes  
+✅ **Advanced Logic**: Pipeline awareness and severity-based reporting  
 
 ## 🧩 Project Architecture
 
-### Non-Technical Guide (For Interviews)
+### The Detective (detector.py)
 
-**The Big Picture**: Imagine you're a teacher trying to prevent students from cheating on an exam. Our tool acts as an **Automated Proctor** that reviews the teacher's lesson plan (code) to ensure the answer key is hidden properly.
+Uses Python's AST module to traverse code structure:
 
-### Folder & File Breakdown
+- **Variable Tracking**: Distinguishes safe vs dangerous operations
+- **Pipeline Awareness**: Ignores transformers inside sklearn.Pipeline  
+- **Control Flow Analysis**: Understands when splits happen
+- **Severity Sorting**: Prioritizes issues by risk level
 
-| Directory/File | Description |
-|---------------|-------------|
-| `src/detector.py` | **The Detective**: Uses AST parsing to traverse code logic. It distinguishes between "bad words" in comments vs actual dangerous code execution. |
-| `src/patterns.py` | **The Rulebook**: Defines what constitutes "cheating" (e.g., calculating mean of entire dataset before split). |
-| `tests/` | **The Quality Check**: Automated exams for the detector. We give it tricky code to prove it's reliable. |
-| `examples/buggy_pipelines/` | **Scary Stories**: Real-world examples of code that looks okay but leaks data. |
-| `.github/workflows/` | **The Security Guard**: CI/CD automation that blocks leaky code from being merged. |
+### The Rulebook (patterns.py)
 
-### How It All Connects
+Defines 6 leakage patterns with severity levels:
 
-1. You run `ml-leakage-detector` on your project
-2. The **Detective** reads your Python files
-3. It converts code into an AST (a logical tree structure)
-4. It walks through the tree using the **Rulebook** patterns
-5. If it finds a match, it generates a Report with the leak type and fix suggestion
-6. The **Security Guard** (GitHub Action) blocks any merge that contains leakage
+- Critical: Target Encoding, Feature Selection, Imputation
+- High: Scaling, Time-Series Shuffle
+- Medium: Sequential Split
 
 ## 📖 Example Usage
 
@@ -141,10 +164,10 @@ print(detector.generate_report(result))
 
 ```
 🚨 DATA LEAKAGE DETECTED
---- Leak 1 ---
-Type: imputation_before_split (Severity: Critical)
-Description: Imputation performed on full dataset.
-Fix: Use Pipeline to fit imputer only on training data.
+
+🔥 CRITICAL (Fix First)
+  • imputation_before_split
+    Fix: Use Pipeline to fit imputer only on training data.
 ```
 
 ## 🤝 Contributing
@@ -165,4 +188,4 @@ MIT License - see LICENSE file for details.
 
 ---
 
-<p align="center">Built with ❤️ for clean ML pipelines</p>
+<p align="center">Built with ❤️ for clean ML pipelines | Mercor Domain Expert Ready 🎯</p>

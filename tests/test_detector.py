@@ -51,10 +51,9 @@ X_scaled = StandardScaler().fit_transform(X_filled)
         result = detector.detect(buggy_code)
         report = detector.generate_report(result)
         assert "DATA LEAKAGE DETECTED" in report
-        assert "Type: imputation_before_split" in report
-        assert "Type: scaling_before_split" in report
-        assert "--- Leak 1 ---" in report
-        assert "--- Leak 2 ---" in report
+        assert "imputation_before_split" in report
+        assert "scaling_before_split" in report
+        assert "CRITICAL" in report
 
     def test_multiple_leaks_detection(self, detector):
         buggy_code = """
