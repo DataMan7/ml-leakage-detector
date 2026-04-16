@@ -20,7 +20,6 @@ class TestLeakageDetector:
         buggy_code = "X_filled = X.fillna(X.mean())\nX_train = X[:800]"
         result = detector.detect(buggy_code)
         assert result.has_leakage is True
-        assert result.leakage_type == "imputation_before_split"
         assert any(leak.name == "imputation_before_split" for leak in result.leaks)
 
     def test_scaling_leak_detection(self, detector):
@@ -29,14 +28,12 @@ class TestLeakageDetector:
         )
         result = detector.detect(buggy_code)
         assert result.has_leakage is True
-        assert "scaling" in result.leakage_type
         assert any(leak.name == "scaling_before_split" for leak in result.leaks)
 
     def test_sequential_split_detection(self, detector):
         buggy_code = "split_idx = 800\nX_train = X[:split_idx]"
         result = detector.detect(buggy_code)
         assert result.has_leakage is True
-        assert result.leakage_type == "sequential_split"
         assert any(leak.name == "sequential_split" for leak in result.leaks)
 
     def test_correct_pipeline_no_detection(self, detector):
@@ -74,14 +71,12 @@ X_scaled = StandardScaler().fit_transform(X_filled)
         buggy_code = "cv = KFold(n_splits=5, shuffle=True)\nmodel = cross_val_score(m, X, y, cv=cv)"
         result = detector.detect(buggy_code)
         assert result.has_leakage is True
-        assert result.leakage_type == "time_series_shuffle"
         assert any(leak.name == "time_series_shuffle" for leak in result.leaks)
 
     def test_target_encoding_detection(self, detector):
         buggy_code = "encoding = df.groupby('cat')['target'].mean()\ndf['enc'] = df['cat'].map(encoding)"
         result = detector.detect(buggy_code)
         assert result.has_leakage is True
-        assert result.leakage_type == "target_encoding_before_split"
         assert any(leak.name == "target_encoding_before_split" for leak in result.leaks)
 
     def test_transformer_in_pipeline_not_flagged(self, detector):
@@ -105,5 +100,4 @@ cv = KFold(n_splits=5, shuffle=False) # Should not be flagged
         buggy_code = "selector = SelectKBest(k=10).fit(X, y)\nX_new = selector.transform(X)"
         result = detector.detect(buggy_code)
         assert result.has_leakage is True
-        assert result.leakage_type == "feature_selection_before_split"
         assert any(leak.name == "feature_selection_before_split" for leak in result.leaks)

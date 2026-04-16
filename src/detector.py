@@ -37,14 +37,25 @@ class LeakageVisitor(ast.NodeVisitor):
     def visit_Call(self, node: ast.Call):
         # First, check if this call is a Pipeline instantiation
         if isinstance(node.func, ast.Name) and node.func.id == 'Pipeline':
-            for keyword in node.keywords:
-                if keyword.arg == 'steps' and isinstance(keyword.value, ast.List):
-                    for element in keyword.value.elts:
-                        if isinstance(element, ast.Tuple) and len(element.elts) == 2:
-                            # The second element of the tuple is the transformer instance
-                            transformer_call = element.elts[1]
-                            if isinstance(transformer_call, ast.Call):
-                                self._safe_transformer_ids.add(id(transformer_call))
+            # Pipeline can be called with positional args or keywords
+            # Pipeline(steps=[...])
+            steps_arg = None
+            # Check if 'steps' is a keyword argument
+            for kw in node.keywords:
+                if kw.arg == 'steps':
+                    steps_arg = kw.value
+                    break
+            # Check if it's the first positional argument
+            if steps_arg is None and node.args:
+                steps_arg = node.args[0]
+            
+            if steps_arg and isinstance(steps_arg, ast.List):
+                for element in steps_arg.elts:
+                    if isinstance(element, ast.Tuple) and len(element.elts) == 2:
+                        # The second element of the tuple is the transformer instance
+                        transformer_call = element.elts[1]
+                        if isinstance(transformer_call, ast.Call):
+                            self._safe_transformer_ids.add(id(transformer_call))
             # Don't process Pipeline itself for leakage patterns, but continue visiting its children
             self.generic_visit(node)
             return
