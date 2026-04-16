@@ -151,11 +151,12 @@ ml-leakage-detector/
 │   └── buggy_pipelines/   # Example leaky code
 ├── .github/
 │   └── workflows/         # CI/CD automation
-└── docs/
-    ├── DEPLOYMENT_GUIDE.md      # AWS EC2 + Docker
-    ├── AI_ARCHITECTURE.md       # AI features spec
-    ├── MONETIZATION_PLAN.md     # Business strategy
-    └── NON_TECHNICAL_GUIDE.md    # For non-technical users
+├── docs/
+│   ├── DEPLOYMENT_GUIDE.md      # AWS EC2 + Docker
+│   ├── AI_ARCHITECTURE.md       # AI features spec
+│   ├── MONETIZATION_PLAN.md     # Business strategy
+│   └── NON_TECHNICAL_GUIDE.md  # For non-technical users
+└── README.md
 ```
 
 ## 📋 Test Results
@@ -209,13 +210,15 @@ See `MONETIZATION_PLAN.md` for full business strategy.
 
 ## 📖 More Documentation
 
+All documentation is in the `docs/` folder:
+
 | Document | Who It's For |
 |----------|--------------|
 | `README.md` | Everyone - overview |
-| `NON_TECHNICAL_GUIDE.md` | Non-technical stakeholders |
-| `DEPLOYMENT_GUIDE.md` | DevOps & engineers |
-| `AI_ARCHITECTURE.md` | AI/ML engineers |
-| `MONETIZATION_PLAN.md` | Business stakeholders |
+| `docs/NON_TECHNICAL_GUIDE.md` | Non-technical stakeholders |
+| `docs/DEPLOYMENT_GUIDE.md` | DevOps & engineers |
+| `docs/AI_ARCHITECTURE.md` | AI/ML engineers |
+| `docs/MONETIZATION_PLAN.md` | Business stakeholders |
 
 ## 🤝 Contributing
 
