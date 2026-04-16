@@ -86,6 +86,29 @@ ml-leakage-detector examples/ --json
 ml-leakage-detector --nlp "I fill missing values with the mean of my whole dataset"
 ```
 
+## 📓 Kaggle Integration
+
+We've tested the detector on real Kaggle projects and found **37 leaks** in typical competition code!
+
+### Quick Start for Kaggle Users
+
+```python
+# In a Kaggle notebook
+!pip install ml-leakage-detector -q
+
+from src.detector import LeakageDetector
+
+detector = LeakageDetector()
+result = detector.detect(your_preprocessing_code)
+
+if result.has_leakage:
+    print("⚠️ LEAKAGE DETECTED - Do not submit!")
+else:
+    print("✅ Safe to submit!")
+```
+
+See [`docs/KAGGLE_INTEGRATION.md`](docs/KAGGLE_INTEGRATION.md) for complete guide with examples from real Kaggle projects.
+
 ## 📊 Detected Leakage Patterns
 
 | Pattern | Severity | Description |
