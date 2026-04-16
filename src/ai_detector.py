@@ -44,9 +44,9 @@ BASE_URL = "https://integrate.api.nvidia.com/v1"
 
 # Model preferences - NVIDIA NIM models (free with NGC)
 MODELS = {
-    "nemotron": "nvidia/nemotron-70b-instruct",  # Best for code
-    "llama": "nvidia/llama-3.1-70b-instruct",     # Excellent reasoning
-    "mistral": "nvidia/mistral-7b-instruct-v0.1", # Fast, lightweight
+    "nemotron": "nvidia/nemotron-4-340b-instruct",  # Best for code
+    "llama": "meta/llama-3.1-70b-instruct",     # Excellent reasoning (works!)
+    "mistral": "mistralai/mistral-nemotron", # Fast, lightweight
 }
 
 # Default model
@@ -117,6 +117,7 @@ class AICodeDoctor:
             model: Model to use (nemotron, llama, mistral). Defaults to nemotron.
         """
         self.model_name = model or DEFAULT_MODEL
+        self.model = self.model_name  # Store model name for API calls
         self.client = None
         
         if NVIDIA_API_KEY:
@@ -255,21 +256,38 @@ FIXED_CODE:
         explanation = []
         fixed_code = []
         in_code_block = False
+        capture_mode = None  # 'explanation' or 'code'
         
         for line in lines:
-            if line.startswith("EXPLANATION:"):
+            stripped = line.strip()
+            
+            # Check for markers (flexible matching)
+            upper_line = line.upper()
+            
+            # Detect start of explanation section
+            if 'EXPLANATION' in upper_line and ':' in line:
+                capture_mode = 'explanation'
+                # Get text after the colon
+                exp_text = line.split(':', 1)[1].strip()
+                if exp_text:
+                    explanation.append(exp_text)
                 continue
-            elif line.startswith("FIXED_CODE:"):
+            
+            # Detect start of code section
+            if 'FIXED_CODE' in upper_line and ':' in line:
+                capture_mode = 'code'
                 in_code_block = True
                 continue
-            elif line.startswith("```"):
-                in_code_block = False
-                continue
-            else:
-                if in_code_block:
+            
+            # Handle code blocks
+            if in_code_block:
+                if stripped.startswith('```'):
+                    in_code_block = False
+                elif stripped:
                     fixed_code.append(line)
-                elif line.strip():
-                    explanation.append(line)
+            # Capture explanation text
+            elif capture_mode == 'explanation' and stripped:
+                explanation.append(stripped)
         
         return " ".join(explanation), "\n".join(fixed_code)
 

@@ -48,6 +48,7 @@ setup(
     entry_points={
         "console_scripts": [
             "ml-leakage-detector=src.detector:main",
+            "ml-ai-detector=src.ai_detector:main",
         ],
     },
     include_package_data=True,
