@@ -27,6 +27,7 @@ In ML, **Data Leakage** occurs when information from the test set "leaks" into t
 - **🔄 CLI Support**: Scan entire directories with JSON output for CI/CD integration
 - **✅ Test Coverage**: 70% coverage with 12 passing tests
 - **📈 Severity-Based Reporting**: Prioritizes issues by risk level (Critical/High/Medium)
+- **🤖 AI-Powered (NEW)**: Auto-generate code fixes with NVIDIA NIM/OpenAI
 
 ## 🚀 Quick Start
 

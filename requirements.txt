@@ -6,6 +6,10 @@ numpy==1.26.2
 # Code analysis
 astor==0.8.1
 
+# AI / LLM features
+openai==1.12.0
+python-dotenv==1.0.0
+
 # Testing
 pytest==7.4.3
 pytest-cov==4.1.0
